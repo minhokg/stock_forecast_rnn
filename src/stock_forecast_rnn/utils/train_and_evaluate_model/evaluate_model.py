@@ -1,3 +1,4 @@
+import logging
 from typing import Dict
 
 import numpy as np
@@ -31,8 +32,8 @@ def evaluate_single_step_model(
         MSE and MAPE.
     """
     pred = model.predict(x_test).reshape(-1, 1)
-
-    scaler = scalers[f"scaler_{target_col}"]
+    logging.info(scalers.keys())
+    scaler = scalers["Close"]
 
     pred = scaler.inverse_transform(pred)
     actual = scaler.inverse_transform(y_test)

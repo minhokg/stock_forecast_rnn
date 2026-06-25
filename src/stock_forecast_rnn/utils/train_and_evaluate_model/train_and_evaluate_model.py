@@ -91,8 +91,8 @@ def train_and_evaluate_model(
 
     # Visualize training and validation MSE.
     plot_training_history(
-        train_mse=history.history["mse"],
-        valid_mse=history.history["val_mse"],
+        train_mse=history.history_["mse"],
+        valid_mse=history.history_["val_mse"],
     )
 
     # Evaluate the model on the test dataset.
