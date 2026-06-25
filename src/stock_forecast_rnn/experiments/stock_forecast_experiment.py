@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Any
 
 import pandas as pd
@@ -99,14 +100,16 @@ class StockForecastExperiment:
             target_col=3,  # Close
         )
 
-        param_grid = {"n_neurons": [10, 20, 30]}
+        param_grid = {"model__n_neurons": [10, 20, 30]}
+
+        build_fn = partial(
+            build_rnn,
+            n_past=n_past,
+            n_features=self.train.shape[1],
+        )
 
         best_model, mse, mape = train_and_evaluate_model(
-            build_fn=lambda n_neurons: build_rnn(
-                n_neurons=n_neurons,
-                n_past=n_past,
-                n_features=self.train.shape[1],
-            ),
+            build_fn=build_fn,
             param_grid=param_grid,
             x_train=x_train,
             y_train=y_train,
@@ -146,14 +149,15 @@ class StockForecastExperiment:
             target_col=3,
         )
 
-        param_grid = {"n_neurons": [10, 20, 30]}
+        param_grid = {"model__n_neurons": [10, 20, 30]}
+        build_fn = partial(
+            build_lstm,
+            n_past=n_past,
+            n_features=self.train.shape[1],
+        )
 
         best_model, mse, mape = train_and_evaluate_model(
-            build_fn=lambda n_neurons: build_lstm(
-                n_neurons=n_neurons,
-                n_past=n_past,
-                n_features=self.train.shape[1],
-            ),
+            build_fn=build_fn,
             param_grid=param_grid,
             x_train=x_train,
             y_train=y_train,
@@ -193,7 +197,7 @@ class StockForecastExperiment:
             target_col=list(range(self.train.shape[1])),
         )
 
-        param_grid = {"activation": ["elu", "relu"]}
+        param_grid = {"model__activation": ["elu", "relu"]}
 
         best_model, mse, mape = train_and_evaluate_model(
             build_fn=lambda activation: build_seq2seq_e1d1(
