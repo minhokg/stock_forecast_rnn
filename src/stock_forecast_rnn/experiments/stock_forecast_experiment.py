@@ -1,3 +1,4 @@
+import logging
 from functools import partial
 from typing import Any
 
@@ -7,7 +8,6 @@ from sklearn.model_selection import KFold
 from stock_forecast_rnn.models.build_models import (
     build_lstm,
     build_rnn,
-    build_seq2seq_e1d1,
 )
 from stock_forecast_rnn.utils.preprocessing.prepare_dataset import (
     prepare_dataset,
@@ -92,6 +92,7 @@ class StockForecastExperiment:
             Number of future observations to predict.
         :type n_future: int
         """
+        logging.info("Start RNN experiment")
         x_train, y_train, x_test, y_test = prepare_dataset(
             train=self.train,
             test=self.test,
@@ -141,6 +142,7 @@ class StockForecastExperiment:
             Number of future observations to predict.
         :type n_future: int
         """
+        logging.info("Start LSTM experiment")
         x_train, y_train, x_test, y_test = prepare_dataset(
             train=self.train,
             test=self.test,
@@ -168,54 +170,6 @@ class StockForecastExperiment:
         )
 
         self.results["lstm"] = {
-            "model": best_model,
-            "mse": mse,
-            "mape": mape,
-        }
-
-    def run_seq2seq(
-        self,
-        n_past: int = 22,
-        n_future: int = 5,
-    ) -> None:
-        """
-        Train and evaluate a Seq2Seq model.
-
-        :param n_past:
-            Number of historical observations.
-        :type n_past: int
-
-        :param n_future:
-            Forecast horizon.
-        :type n_future: int
-        """
-        x_train, y_train, x_test, y_test = prepare_dataset(
-            train=self.train,
-            test=self.test,
-            n_past=n_past,
-            n_future=n_future,
-            target_col=list(range(self.train.shape[1])),
-        )
-
-        param_grid = {"model__activation": ["elu", "relu"]}
-
-        best_model, mse, mape = train_and_evaluate_model(
-            build_fn=lambda activation: build_seq2seq_e1d1(
-                activation=activation,
-                n_past=n_past,
-                n_future=n_future,
-                n_features=self.train.shape[1],
-            ),
-            param_grid=param_grid,
-            x_train=x_train,
-            y_train=y_train,
-            x_test=x_test,
-            y_test=y_test,
-            scalers=self.scalers,
-            kfold=self.kfold,
-        )
-
-        self.results["seq2seq"] = {
             "model": best_model,
             "mse": mse,
             "mape": mape,

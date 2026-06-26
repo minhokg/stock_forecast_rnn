@@ -74,9 +74,6 @@ def main() -> None:
     logging.info("Training LSTM...")
     experiment.run_lstm()
 
-    logging.info("Training Seq2Seq...")
-    experiment.run_seq2seq()
-
     # Show final results.
     logging.info("\nExperiment Summary")
     logging.info("=" * 60)
